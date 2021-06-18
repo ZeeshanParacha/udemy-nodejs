@@ -10,6 +10,12 @@ const app = express();
 //import routes
 const authRoutes = require("./routes/auth")
 
+// app middlewares
+app.use(morgan('dev'))
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cors({ origin: process.env.CLIENT_URL }))
+
 //middleware
 app.use("/api", authRoutes)
 
