@@ -1,3 +1,5 @@
 npm init -y
 npm i express nodemon
 npm i mongoose
+npm i body-parser cors dotenv express-jwt express-validator jsonwebtoken aws-sdk
+npm i morgan
