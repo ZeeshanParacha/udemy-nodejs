@@ -59,7 +59,7 @@ userSchema.methods = {
   authenticate: function (plainText) {
     return this.encryptPassword(plainText) === this.hashed_password;
   },
-  encryptPassword = function (password) {
+  encryptPassword: function (password) {
     if (!password) return ""
     try {
       return crypto.createHmac('sha1', this.salt)
@@ -70,7 +70,7 @@ userSchema.methods = {
       return ""
     }
   },
-  makeSalt = function () {
+  makeSalt: function () {
     return Math.round(new Date().valueOf * Math.random()) + ""
   }
 }
