@@ -1,7 +1,7 @@
-const { template } = require("../email-templates/verification");
 const User = require('../models/user')
 const AWS = require("aws-sdk")
 const jwt = require('jsonwebtoken')
+const { registerEmailParams } = require("../helpers/email")
 
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -21,34 +21,19 @@ exports.register = (req, res) => {
     const token = jwt.sign({ name, email, password }, process.env.JWT_ACCOUNT_ACTIVATION, {
       expiresIn: '10m'
     })
-    const activationUrl = `${process.env.CLIENT_URL}/auth/activate/${token}`
-    const params = {
-      Source: process.env.EMAIL_FROM,
-      Destination: { ToAddresses: [email] },
-      ReplyToAddresses: [process.env.EMAIL_TO],
-      Message: {
-        Body: {
-          Html: {
-            Charset: 'UTF-8',
-            Data: template(activationUrl, name)
-          }
-        },
-        Subject: {
-          Charset: 'UTF-8',
-          Data: "Complete your registration"
-        }
-      }
-    };
+    //send email
+    const params = registerEmailParams(email, name, token)
     const sendEmailOnRegister = SES.sendEmail(params).promise();
     sendEmailOnRegister
-      .then(res => {
-        console.log("email submitted to SES", res);
-        res.send({ success: 'Email Sent' })
+      .then(response => {
+        res.json({
+          message: `Email has been sent to ${email}, Follow the instructions to complete your registration`
+        })
       })
       .catch(error => {
-        console.log("email submitted to SES", error);
-        res.send({ error: 'Email Failed' })
+        res.json({
+          error: `We could not verify your email, please try again!`
+        })
       })
   })
-
 }
